@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        Twitter Block With Love Dev
+// @name        Twitter Block With Love
 // @namespace   https://www.eolstudy.com
-// @version     2.6.0
+// @version     2.7.0
 // @description Block or mute all the Twitter users who like or RT a specific tweet, with love.
 // @author      Eol, OverflowCat, yuanLeeMidori
 // @run-at      document-end
@@ -702,22 +702,26 @@
         It will only be triggered when the user clicks the back button, though, and that is of no use for us.
       */
       waitForKeyElements('div > div > div > div > div > h2#modal-header[dir="auto"][aria-level="2"][role="heading"] > span', ele => {
-        const ancestor = get_ancestor(ele, 3 + 1)
+        const ancestor = get_ancestor(ele, 3 + 1) // ele is span, not h2
         const currentURL = window.location.href
-        if (currentURL.endsWith("/likes")) {
+        if (/\/status\/[0-9]+\/likes$/.test(currentURL)) {
           mount_switch(ancestor, i18n.include_original_tweeter)
           mount_button(ancestor, i18n.mute_btn, mute_all_likers, success_notice(DEFAULT_IDENTIFIER, i18n.mute_success))
           mount_button(ancestor, i18n.block_btn, block_all_likers, success_notice(DEFAULT_IDENTIFIER, i18n.block_success))
-        } else if (currentURL.endsWith("retweets")) {
+        } else if (currentURL.endsWith("/retweets")) {
           mount_switch(ancestor, i18n.include_original_tweeter)
           mount_button(ancestor, i18n.mute_btn, mute_no_comment_retweeters, success_notice(DEFAULT_IDENTIFIER, i18n.mute_success))
           mount_button(ancestor, i18n.block_btn, block_no_comment_retweeters, success_notice(DEFAULT_IDENTIFIER, i18n.block_success))
+        } else if (/\/lists\/[0-9]+\/members$/.test(currentURL)) {
+          mount_switch(ancestor, i18n.include_original_tweeter)
+          mount_button(ancestor, i18n.mute_btn, mute_list_members, success_notice(DEFAULT_IDENTIFIER, i18n.mute_success))
+          mount_button(ancestor, i18n.block_btn, block_list_members, success_notice(DEFAULT_IDENTIFIER, i18n.block_success))
         }
       })
     } else {
       // Old approach when lang is supported
       waitForKeyElements('h2:has(> span:contains(' + i18n.like_title + '))', ele => {
-        const ancestor = get_ancestor(ele, 3)
+        const ancestor = get_ancestor(ele, 3) // ele is h2
         mount_switch(ancestor, i18n.include_original_tweeter)
         const like_list_identifier = 'div[aria-label="' + i18n.like_list_identifier + '"]'
         mount_button(ancestor, i18n.mute_btn, mute_all_likers, success_notice(like_list_identifier, i18n.mute_success))
