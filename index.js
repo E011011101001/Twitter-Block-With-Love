@@ -367,24 +367,19 @@
     const users = await ajax.get(`/2/timeline/liked_by.json?tweet_id=${tweetId}`).then(
       res => res.data.globalObjects.users
     )
-
-    let likers = []
-    Object.keys(users).forEach(user => likers.push(user)) // keys of users are id strings
+    const likers = Object.keys(users) // keys of users are id strings
     return likers
   }
 
   async function fetch_no_comment_retweeters (tweetId) {
     const users = (await ajax.get(`/2/timeline/retweeted_by.json?tweet_id=${tweetId}`)).data.globalObjects.users
-
-    let targets = []
-    Object.keys(users).forEach(user => targets.push(user))
+    const targets = Object.keys(users)
     return targets
   }
 
   async function fetch_list_members (listId) {
     const users = (await ajax.get(`/1.1/lists/members.json?list_id=${listId}`)).data.users
-    let members = []
-    members = users.map(u => u.id_str)
+    const members = users.map(u => u.id_str)
     return members
   }
 
@@ -413,7 +408,7 @@
     const tweetData = (await ajax.get(`/2/timeline/conversation/${tweetId}.json`)).data
     // Find the tweeter by username
     const users = tweetData.globalObjects.users
-    for (let key in users) {
+    for (const key in users) {
       if (users[key].screen_name === screen_name) {
         return key
       }
@@ -433,7 +428,7 @@
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) likers.push(tweeter)
     }
-    likers.forEach(id => block_user(id))
+    likers.forEach(block_user)
   }
 
   async function mute_all_likers () {
@@ -443,17 +438,17 @@
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) likers.push(tweeter)
     }
-    likers.forEach(id => mute_user(id))
+    likers.forEach(mute_user)
   }
 
   async function block_no_comment_retweeters () {
     const tweetId = get_tweet_id()
-    const retweeters = await fetch_no_comment_retweeters(tweetId)
+    let retweeters = await fetch_no_comment_retweeters(tweetId)
     if (inlude_tweeter()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) retweeters.push(tweeter)
     }
-    retweeters.forEach(id => block_user(id))
+    retweeters.forEach(id)
 
     const tabName = location.href.split('retweets/')[1]
     if (tabName === 'with_comments') {
@@ -466,12 +461,12 @@
 
   async function mute_no_comment_retweeters () {
     const tweetId = get_tweet_id()
-    const retweeters = await fetch_no_comment_retweeters(tweetId)
+    let retweeters = await fetch_no_comment_retweeters(tweetId)
     if (inlude_tweeter()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) retweeters.push(tweeter)
     }
-    retweeters.forEach(id => mute_user(id))
+    retweeters.forEach(mute_user)
 
     const tabName = location.href.split('retweets/')[1]
     if (tabName === 'with_comments') {
@@ -487,13 +482,13 @@
   async function block_list_members () {
     const listId = get_list_id()
     const members = await fetch_list_members(listId)
-    members.forEach(id => block_user(id))
+    members.forEach(block_user)
   }
 
   async function mute_list_members () {
     const listId = get_list_id()
     const members = await fetch_list_members(listId)
-    members.forEach(id => mute_user(id))
+    members.forEach(mute_user)
   }
 
   function get_notifier_of (msg) {
