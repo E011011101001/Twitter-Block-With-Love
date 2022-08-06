@@ -1,9 +1,24 @@
 // ==UserScript==
-// @name        Twitter Block With Love
+// @name        Twitter Block with Love
+// @name:zh-CN  Twitter Block with Love
+// @name:zh-TW  Twitter Block with Love
+// @name:ja     Twitter Block with Love
+// @name:ko     Twitter Block with Love
+// @name:vi     Chặn bằng tình yêu trên Twitter
+// @name:fr     Twitter Block with Love
+// @name:de     Blockieren mit Liebe auf Twitter
 // @namespace   https://www.eolstudy.com
-// @version     2.8.0
+// @homepage    https://github.com/E011011101001/Twitter-Block-With-Love
+// @icon        https://raw.githubusercontent.com/E011011101001/Twitter-Block-With-Love/master/imgs/icon.svg
+// @version     2.8.2
 // @description Block or mute all the Twitter users who like or RT a specific tweet, with love.
+// @description:zh-CN 屏蔽或隐藏所有转发或点赞某条推文的推特用户
+// @description:zh-TW 封鎖或靜音所有轉推或喜歡某則推文的推特使用者
+// @description:ja あるツイートに「いいね」や「リツイート」をしたTwitterユーザー全員をブロックまたはミュートする機能を追加する
+// @description:ko 특정 트윗을 좋아하거나 리트윗하는 모든 트위터 사용자 차단 또는 음소거
+// @description:de Blockieren Sie alle Twitter-Nutzer, denen ein bestimmter Tweet gefällt oder die ihn retweeten, oder schalten Sie sie stumm - mit Liebe.
 // @author      Eol, OverflowCat, yuanLeeMidori
+// @license     MIT
 // @run-at      document-end
 // @grant       GM_registerMenuCommand
 // @match       https://twitter.com/*
@@ -148,8 +163,6 @@
       block_btn: 'Block all',
       block_success: 'All users blocked!',
       mute_btn: 'Mute all',
-      mute_btn: 'Mute all',
-      mute_success: 'All users muted!',
       mute_success: 'All users muted!',
       include_original_tweeter: 'Include the original Tweeter',
       logs: 'Logs',
@@ -212,8 +225,8 @@
       like_title: 'Được thích bởi',
       retweet_list_identifier: 'Dòng thời gian: Được Tweet lại bởi',
       retweet_title: 'Được Tweet lại bởi',
-      block_btn: 'Tắt tiếng tất cả',
-      mute_btn: 'Chặn tất cả',
+      block_btn: 'Chặn tất cả',
+      mute_btn: 'Tắt tiếng tất cả',
       block_success: 'Tất cả tài khoản đã bị chặn!',
       mute_success: 'Tất cả tài khoản đã bị tắt tiếng!',
       include_original_tweeter: 'Tweeter gốc',
@@ -285,15 +298,12 @@
       let langnames = []
       Object.values(translations).forEach(language => langnames.push(language.lang_name))
       langnames = langnames.join(', ')
-      let issue = confirm(
+      confirm(
         'Twitter Block With Love userscript does not support your language (language code: "' + lang + '").\n' +
         'Please send feedback at Greasyfork.com or open an issue at Github.com.\n' +
         'Before that, you can edit the userscript yourself or just switch the language of Twitter Web App to any of the following languages: ' +
         langnames + '.\n\nDo you want to open an issue?'
-      )
-      if (issue) {
-        window.location.replace("https://github.com/E011011101001/Twitter-Block-With-Love/issues/new/")
-      }
+      ) && window.location.replace("https://github.com/E011011101001/Twitter-Block-With-Love/issues/new/")
     }
   }
 
