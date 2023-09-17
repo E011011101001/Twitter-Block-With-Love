@@ -4,7 +4,7 @@
 // @homepage    https://github.com/E011011101001/Twitter-Block-With-Love
 // @icon        https://raw.githubusercontent.com/E011011101001/Twitter-Block-With-Love/master/imgs/icon.svg
 // @version     2.8.3
-// @description Block or mute all the Twitter users who like or RT a specific tweet, with love.
+// @description Block or mute all the Twitter users who like or Repost a specific tweet, with love.
 // @description:zh-CN 屏蔽或隐藏所有转发或点赞某条推文的推特用户
 // @description:zh-TW 封鎖或靜音所有轉推或喜歡某則推文的推特使用者
 // @description:ja あるツイートに「いいね」や「リツイート」をしたTwitterユーザー全員をブロックまたはミュートする機能を追加する
@@ -15,6 +15,7 @@
 // @run-at      document-end
 // @grant       GM_registerMenuCommand
 // @match       https://twitter.com/*
+// @match       https://x.com/*
 // @match       https://mobile.twitter.com/*
 // @match       https://tweetdeck.twitter.com/*
 // @exclude     https://twitter.com/account/*
@@ -321,7 +322,12 @@
 
   function get_theme_color () {
     const FALLBACK_COLOR = 'rgb(128, 128, 128)'
-    let bgColor = getComputedStyle(document.querySelector('#modal-header > span')).color || FALLBACK_COLOR
+    let bgColor = FALLBACK_COLOR
+    // try {
+    //   bgColor = getComputedStyle(document.querySelector('h2 > span')).color
+    // } catch (e) {
+    //   console.info('[TBWL] bgColor not found. Falling back to default.')
+    // }
     let buttonTextColor = hex_to_rgb(invert_hex(rgba_to_hex(bgColor)))
     for (const ele of document.querySelectorAll('div[role=\'button\']')) {
       const color = ele?.style?.backgroundColor
@@ -381,7 +387,7 @@
     return location.href.split('lists/')[1].split('/')[0]
   }
 
-  // fetch_likers and fetch_no_comment_retweeters need to be merged into one function
+  // fetch_likers and fetch_no_comment_reposters need to be merged into one function
   async function fetch_likers (tweetId) {
     const users = await ajax.get(`/2/timeline/liked_by.json?tweet_id=${tweetId}`).then(
       res => res.data.globalObjects.users
@@ -390,7 +396,7 @@
     return likers
   }
 
-  async function fetch_no_comment_retweeters (tweetId) {
+  async function fetch_no_comment_reposters (tweetId) {
     const users = (await ajax.get(`/2/timeline/retweeted_by.json?tweet_id=${tweetId}`)).data.globalObjects.users
     const targets = Object.keys(users)
     return targets
@@ -439,7 +445,7 @@
     return $('#bwl-include-tweeter').checked
   }
 
-  // block_all_liker and block_no_comment_retweeters need to be merged
+  // block_all_liker and block_no_comment_reposters need to be merged
   async function block_all_likers () {
     const tweetId = get_tweet_id()
     const likers = await fetch_likers(tweetId)
@@ -464,41 +470,41 @@
     likers.forEach(mute_user)
   }
 
-  async function block_no_comment_retweeters () {
+  async function block_no_comment_reposters () {
     const tweetId = get_tweet_id()
-    const retweeters = await fetch_no_comment_retweeters(tweetId)
+    const reposters = await fetch_no_comment_reposters(tweetId)
     if (inlude_tweeter()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
-        retweeters.push(tweeter)
+        reposters.push(tweeter)
       }
     }
-    retweeters.forEach(block_user)
+    reposters.forEach(block_user)
 
     const tabName = location.href.split('retweets/')[1]
     if (tabName === 'with_comments') {
-      if (!block_no_comment_retweeters.hasAlerted) {
-        block_no_comment_retweeters.hasAlerted = true
+      if (!block_no_comment_reposters.hasAlerted) {
+        block_no_comment_reposters.hasAlerted = true
         alert(i18n.block_rt_notice)
       }
     }
   }
 
-  async function mute_no_comment_retweeters () {
+  async function mute_no_comment_reposters () {
     const tweetId = get_tweet_id()
-    const retweeters = await fetch_no_comment_retweeters(tweetId)
+    const reposters = await fetch_no_comment_reposters(tweetId)
     if (inlude_tweeter()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
-        retweeters.push(tweeter)
+        reposters.push(tweeter)
       }
     }
-    retweeters.forEach(mute_user)
+    reposters.forEach(mute_user)
 
     const tabName = location.href.split('retweets/')[1]
     if (tabName === 'with_comments') {
-      if (!block_no_comment_retweeters.hasAlerted) {
-        block_no_comment_retweeters.hasAlerted = true
+      if (!block_no_comment_reposters.hasAlerted) {
+        block_no_comment_reposters.hasAlerted = true
         alert(
           'TBWL has only muted users that retweeted without comments.\n Please mute users retweeting with comments manually.'
         )
@@ -628,8 +634,8 @@
         color:rgb(255, 255, 255);
         background-color: rgb(29, 155, 240);
         font-family: ${FALLBACK_FONT_FAMILY};
-        font-size:15px;
-        line-height:20px;
+        font-size: 15px;
+        line-height: 20px;
         overflow-wrap: break-word;
       }
       .bwl-btn-base {
@@ -639,6 +645,8 @@
         border: 1px solid ${colors.bgColor} !important;
         border-radius: 9999px;
         background-color: ${colors.bgColor};
+        display: flex;
+        align-items: center
       }
       .bwl-btn-mousedown {
         background-color: ${colors.mousedownColor};
@@ -660,6 +668,7 @@
       .bwl-text-font {
         font-family: ${get_font_family()};
         color: ${colors.buttonTextColor};
+        font-size: 14px;
       }
       .container {
         margin-top: 0px;
@@ -684,7 +693,7 @@
         content: '';
         position: absolute;
         left: 0;
-        top: 0;
+        top: -5px;
         margin: 0px;
         width: 22px;
         height: 22px;
@@ -704,8 +713,8 @@
         transition: transform ease 0.2s;
         will-change: transform;
         position: absolute;
-        top: 8px;
-        left: 6px;
+        top: 3px;
+        left: 8px;
       }
       .checkbox input[type="checkbox"]:checked ~ label::before {
         color: ${colors.bgColor};
@@ -738,33 +747,70 @@
     </style>`)
   }
 
-  function main () {
-    let inited = false
-
+  function compose_panel () {
     const notice_block_success = get_notifier_of('Successfully blocked.')
     const notice_mute_success = get_notifier_of('Successfully muted.')
 
-    waitForKeyElements('h2#modal-header[aria-level="2"][role="heading"]', ele => {
-      if (!inited) {
-        insert_css()
-        inited = true
-      }
-      const ancestor = get_ancestor(ele, 3)
+    const TBWLPanel = $(`<div id="TBWL-panel" style="
+      display:flex; align-items:center; justify-content:center; border-bottom-width:1px;border-bottom-style: solid;
+      border-color: rgb(239, 243, 244);
+      padding-top: 3px;
+      padding-bottom: 3px;
+    "></div>`)
+    mount_switch(TBWLPanel, i18n.include_original_tweeter)
+    mount_button(TBWLPanel, i18n.mute_btn, mute_all_likers, notice_mute_success)
+    mount_button(TBWLPanel, i18n.block_btn, block_all_likers, notice_block_success)
+    return TBWLPanel.hide()
+  }
+
+  function main () {
+    const sleepTime = 700 // ms
+
+    insert_css()
+    const TBWLPanel = compose_panel()
+
+    let prevURL = undefined
+    setInterval(_ => {
       const currentURL = window.location.href
-      if (/\/status\/[0-9]+\/likes$/.test(currentURL)) {
-        mount_switch(ancestor, i18n.include_original_tweeter)
-        mount_button(ancestor, i18n.mute_btn, mute_all_likers, notice_mute_success)
-        mount_button(ancestor, i18n.block_btn, block_all_likers, notice_block_success)
-      } else if (currentURL.endsWith('/retweets')) {
-        mount_switch(ancestor, i18n.include_original_tweeter)
-        mount_button(ancestor, i18n.mute_btn, mute_no_comment_retweeters, notice_mute_success)
-        mount_button(ancestor, i18n.block_btn, block_no_comment_retweeters, notice_block_success)
-      } else if (/\/lists\/[0-9]+\/members$/.test(currentURL)) {
-        mount_switch(ancestor, i18n.include_original_tweeter)
-        mount_button(ancestor, i18n.mute_btn, mute_list_members, notice_mute_success)
-        mount_button(ancestor, i18n.block_btn, block_list_members, notice_block_success)
+      if (prevURL !== currentURL) {
+        prevURL = currentURL
+
+        // Attention: may change to /reposts at any time.
+        // Good job, Elon.
+        // ♪ CEO, entrepreneur, born in 1971, Elon~~ Elon Reeve Musk~~ ♪♪
+        if (currentURL.endsWith('/likes') || currentURL.endsWith('/retweets')) {
+          if ($('TBWL-panel').length) {
+            TBWLPanel.slideDown('fast')
+          } else {
+            waitForKeyElements('div[data-testid="primaryColumn"] section', ele => {
+              TBWLPanel.insertBefore(ele)
+              TBWLPanel.slideDown()
+            }, true)
+          }
+        } else {
+          TBWLPanel.slideUp('fast')
+        }
       }
-    })
+    }, sleepTime)
+
+    // waitForKeyElements('h2#modal-header[aria-level="2"][role="heading"]', ele => {
+    //   if (!inited) {
+    //     insert_css()
+    //     inited = true
+    //   }
+    //   const ancestor = get_ancestor(ele, 3)
+    //   const currentURL = window.location.href
+    //   if (/\/status\/[0-9]+\/likes$/.test(currentURL)) {
+    //   } else if (currentURL.endsWith('/retweets')) {
+    //     mount_switch(ancestor, i18n.include_original_tweeter)
+    //     mount_button(ancestor, i18n.mute_btn, mute_no_comment_reposters, notice_mute_success)
+    //     mount_button(ancestor, i18n.block_btn, block_no_comment_reposters, notice_block_success)
+    //   } else if (/\/lists\/[0-9]+\/members$/.test(currentURL)) {
+    //     mount_switch(ancestor, i18n.include_original_tweeter)
+    //     mount_button(ancestor, i18n.mute_btn, mute_list_members, notice_mute_success)
+    //     mount_button(ancestor, i18n.block_btn, block_list_members, notice_block_success)
+    //   }
+    // })
   }
 
   main()
