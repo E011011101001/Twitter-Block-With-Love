@@ -3,7 +3,7 @@
 // @namespace   https://www.eolstudy.com
 // @homepage    https://github.com/E011011101001/Twitter-Block-With-Love
 // @icon        https://raw.githubusercontent.com/E011011101001/Twitter-Block-With-Love/master/imgs/icon.svg
-// @version     2.8.3
+// @version     2.9.0
 // @description Block or mute all the Twitter users who like or Repost a specific tweet, with love.
 // @description:zh-CN 屏蔽或隐藏所有转发或点赞某条推文的推特用户
 // @description:zh-TW 封鎖或靜音所有轉推或喜歡某則推文的推特使用者
@@ -470,7 +470,7 @@
     likers.forEach(mute_user)
   }
 
-  async function block_no_comment_reposters () {
+  async function block_reposters () {
     const tweetId = get_tweet_id()
     const reposters = await fetch_no_comment_reposters(tweetId)
     if (inlude_tweeter()) {
@@ -480,17 +480,9 @@
       }
     }
     reposters.forEach(block_user)
-
-    const tabName = location.href.split('retweets/')[1]
-    if (tabName === 'with_comments') {
-      if (!block_no_comment_reposters.hasAlerted) {
-        block_no_comment_reposters.hasAlerted = true
-        alert(i18n.block_rt_notice)
-      }
-    }
   }
 
-  async function mute_no_comment_reposters () {
+  async function mute_reposters () {
     const tweetId = get_tweet_id()
     const reposters = await fetch_no_comment_reposters(tweetId)
     if (inlude_tweeter()) {
@@ -500,16 +492,6 @@
       }
     }
     reposters.forEach(mute_user)
-
-    const tabName = location.href.split('retweets/')[1]
-    if (tabName === 'with_comments') {
-      if (!block_no_comment_reposters.hasAlerted) {
-        block_no_comment_reposters.hasAlerted = true
-        alert(
-          'TBWL has only muted users that retweeted without comments.\n Please mute users retweeting with comments manually.'
-        )
-      }
-    }
   }
 
   async function block_list_members () {
@@ -522,6 +504,28 @@
     const listId = get_list_id()
     const members = await fetch_list_members(listId)
     members.forEach(mute_user)
+  }
+
+  async function mute () {
+    const url = window.location.href
+    if (url.endsWith('/likes')) {
+      mute_all_likers()
+    } else if (url.endsWith('/retweets')) {
+      mute_reposters()
+    } else {
+      console.error('Mute is not implemented on this page.')
+    }
+  }
+
+  async function block () {
+    const url = window.location.href
+    if (url.endsWith('/likes')) {
+      block_all_likers()
+    } else if (url.endsWith('/retweets')) {
+      block_reposters()
+    } else {
+      console.error('Block is not implemented on this page.')
+    }
   }
 
   function get_notifier_of (msg) {
@@ -542,8 +546,10 @@
       $(banner).children('.tbwl-notice').append(closeButton)
 
       $('#layers').append(banner)
+
+      // TODO: after the hiding, the tab gets sluggish if revisited
+      $('div[data-testid="cellInnerDiv"]:has(div[role="button"])').parent().hide()
       setTimeout(() => banner.remove(), 5000)
-      $('div[data-testid="app-bar-close"]').click()
     }
   }
 
@@ -624,6 +630,12 @@
 
     // TODO: reduce repeated styles
     $('head').append(`<style>
+      #tbwl-panel {
+        display:flex; align-items:center; justify-content:center; border-bottom-width:1px;border-bottom-style: solid;
+        border-color: rgb(239, 243, 244);
+        padding-top: 3px;
+        padding-bottom: 3px;
+      }
       .tbwl-notice {
         align-self: center;
         display: flex;
@@ -751,15 +763,11 @@
     const notice_block_success = get_notifier_of('Successfully blocked.')
     const notice_mute_success = get_notifier_of('Successfully muted.')
 
-    const TBWLPanel = $(`<div id="TBWL-panel" style="
-      display:flex; align-items:center; justify-content:center; border-bottom-width:1px;border-bottom-style: solid;
-      border-color: rgb(239, 243, 244);
-      padding-top: 3px;
-      padding-bottom: 3px;
+    const TBWLPanel = $(`<div id="tbwl-panel" style="
     "></div>`)
     mount_switch(TBWLPanel, i18n.include_original_tweeter)
-    mount_button(TBWLPanel, i18n.mute_btn, mute_all_likers, notice_mute_success)
-    mount_button(TBWLPanel, i18n.block_btn, block_all_likers, notice_block_success)
+    mount_button(TBWLPanel, i18n.mute_btn, mute, notice_mute_success)
+    mount_button(TBWLPanel, i18n.block_btn, block, notice_block_success)
     return TBWLPanel.hide()
   }
 
@@ -775,14 +783,14 @@
       if (prevURL !== currentURL) {
         prevURL = currentURL
 
-        // Attention: may change to /reposts at any time.
+        // Attention: /retweets may change to /reposts at any time.
         // Good job, Elon.
         // ♪ CEO, entrepreneur, born in 1971, Elon~~ Elon Reeve Musk~~ ♪♪
         if (currentURL.endsWith('/likes') || currentURL.endsWith('/retweets')) {
-          if ($('TBWL-panel').length) {
+          if ($('#tbwl-panel').length) {
             TBWLPanel.slideDown('fast')
           } else {
-            waitForKeyElements('div[data-testid="primaryColumn"] section', ele => {
+            waitForKeyElements('div[data-testid="primaryColumn"] section, div[data-testid="primaryColumn"] div[data-testid="emptyState"]', ele => {
               TBWLPanel.insertBefore(ele)
               TBWLPanel.slideDown()
             }, true)
@@ -793,24 +801,20 @@
       }
     }, sleepTime)
 
-    // waitForKeyElements('h2#modal-header[aria-level="2"][role="heading"]', ele => {
-    //   if (!inited) {
-    //     insert_css()
-    //     inited = true
-    //   }
-    //   const ancestor = get_ancestor(ele, 3)
-    //   const currentURL = window.location.href
-    //   if (/\/status\/[0-9]+\/likes$/.test(currentURL)) {
-    //   } else if (currentURL.endsWith('/retweets')) {
-    //     mount_switch(ancestor, i18n.include_original_tweeter)
-    //     mount_button(ancestor, i18n.mute_btn, mute_no_comment_reposters, notice_mute_success)
-    //     mount_button(ancestor, i18n.block_btn, block_no_comment_reposters, notice_block_success)
-    //   } else if (/\/lists\/[0-9]+\/members$/.test(currentURL)) {
-    //     mount_switch(ancestor, i18n.include_original_tweeter)
-    //     mount_button(ancestor, i18n.mute_btn, mute_list_members, notice_mute_success)
-    //     mount_button(ancestor, i18n.block_btn, block_list_members, notice_block_success)
-    //   }
-    // })
+    // TODO: merge into the above way
+    // need a way to hide the include_original_tweeter option
+    waitForKeyElements('h2#modal-header[aria-level="2"][role="heading"]', ele => {
+      const ancestor = get_ancestor(ele, 3)
+      const currentURL = window.location.href
+      if (/\/lists\/[0-9]+\/members$/.test(currentURL)) {
+        mount_switch(ancestor, i18n.include_original_tweeter)
+
+        const notice_block_success = get_notifier_of('Successfully blocked.')
+        const notice_mute_success = get_notifier_of('Successfully muted.')
+        mount_button(ancestor, i18n.mute_btn, mute_list_members, notice_mute_success)
+        mount_button(ancestor, i18n.block_btn, block_list_members, notice_block_success)
+      }
+    })
   }
 
   main()
