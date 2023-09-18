@@ -3,8 +3,8 @@
 // @namespace   https://www.eolstudy.com
 // @homepage    https://github.com/E011011101001/Twitter-Block-With-Love
 // @icon        https://raw.githubusercontent.com/E011011101001/Twitter-Block-With-Love/master/imgs/icon.svg
-// @version     2.9.0
-// @description Block or mute all the Twitter users who like or Repost a specific tweet, with love.
+// @version     2.9.1
+// @description Block or mute all the Twitter users who like or repost a specific post(Tweet), with love.
 // @description:zh-CN 屏蔽或隐藏所有转发或点赞某条推文的推特用户
 // @description:zh-TW 封鎖或靜音所有轉推或喜歡某則推文的推特使用者
 // @description:ja あるツイートに「いいね」や「リツイート」をしたTwitterユーザー全員をブロックまたはミュートする機能を追加する
