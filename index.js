@@ -441,15 +441,15 @@
     return undefined
   }
 
-  function inlude_tweeter () {
-    return $('#bwl-include-tweeter').checked
+  function is_poster_included () {
+    return $('#bwl-include-tweeter').prop('checked')
   }
 
   // block_all_liker and block_no_comment_reposters need to be merged
   async function block_all_likers () {
     const tweetId = get_tweet_id()
     const likers = await fetch_likers(tweetId)
-    if (inlude_tweeter()) {
+    if (is_poster_included()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
         likers.push(tweeter)
@@ -461,7 +461,7 @@
   async function mute_all_likers () {
     const tweetId = get_tweet_id()
     const likers = await fetch_likers(tweetId)
-    if (inlude_tweeter()) {
+    if (is_poster_included()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
         likers.push(tweeter)
@@ -473,7 +473,7 @@
   async function block_reposters () {
     const tweetId = get_tweet_id()
     const reposters = await fetch_no_comment_reposters(tweetId)
-    if (inlude_tweeter()) {
+    if (is_poster_included()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
         reposters.push(tweeter)
@@ -485,7 +485,7 @@
   async function mute_reposters () {
     const tweetId = get_tweet_id()
     const reposters = await fetch_no_comment_reposters(tweetId)
-    if (inlude_tweeter()) {
+    if (is_poster_included()) {
       const tweeter = await get_tweeter(tweetId)
       if (tweeter) {
         reposters.push(tweeter)
