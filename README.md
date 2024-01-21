@@ -1,6 +1,8 @@
 # Twitter-Block-With-Love
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**Temporarily broken. See [issue#25](https://github.com/E011011101001/Twitter-Block-With-Love/issues/25).**
+
 ## Intro
 ~~Improve your Twitter experience by mass blocking or muting all the Twitter users who liked a specific Tweet, with love.~~
 
