@@ -1,17 +1,19 @@
 # Twitter-Block-With-Love
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Temporarily broken. See [issue#25](https://github.com/E011011101001/Twitter-Block-With-Love/issues/25).**
+**[issue#25](https://github.com/E011011101001/Twitter-Block-With-Love/issues/25) Seems fixed.**
 
 ## Intro
-~~Improve your Twitter experience by mass blocking or muting all the Twitter users who liked a specific Tweet, with love.~~
+Improve your Twitter experience by mass blocking or muting all the Twitter users who liked a specific Tweet, with love.
 
 Improve your X-perience by mass blocking or muting all the X users who liked a specific post, with love.
 
 It also supports blocking or muting reposters or list members.
 
 ## Install
-Visit https://greasyfork.org/en/scripts/398540-twitter-block-with-love and install. You may also need to install a script manager like [**Tampermonkey**](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN) for Chrome or [**Greasemonkey**](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) for Firefox, or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) for Firefox Android.
+[Click here to install it](https://raw.githubusercontent.com/nwxz/Twitter-Block-With-Love-2024/master/index.user.js).
+
+You may also need to install a script manager like [**Tampermonkey**](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN) for Chrome or [**Greasemonkey**](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) for Firefox, or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) for Firefox Android.
 
 If you are using Tampermonkey on Firefox and run into unexcepted problems, please refer to [this issue](https://github.com/E011011101001/Twitter-Block-With-Love/issues/1#issuecomment-606785462). Turning off `security.csp.enable` on [about:config](about:config) may help.
 
