@@ -11,7 +11,7 @@ Improve your X-perience by mass blocking or muting all the X users who liked a s
 It also supports blocking or muting reposters or list members.
 
 ## Install
-[Click here to install it](https://raw.githubusercontent.com/nwxz/Twitter-Block-With-Love-2024/master/index.user.js).
+Visit https://greasyfork.org/en/scripts/398540-twitter-block-with-love and install.
 
 You may also need to install a script manager like [**Tampermonkey**](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN) for Chrome or [**Greasemonkey**](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) for Firefox, or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) for Firefox Android.
 
