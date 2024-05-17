@@ -23,6 +23,8 @@
 // @require     https://cdn.jsdelivr.net/npm/axios@0.25.0/dist/axios.min.js
 // @require     https://cdn.jsdelivr.net/npm/qs@6.10.3/dist/qs.min.js
 // @require     https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js
+// @downloadURL https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.user.js
+// @updateURL https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.meta.js
 // ==/UserScript==
 
 /* global axios $ Qs */
@@ -368,7 +370,7 @@
   }
 
   const ajax = axios.create({
-    baseURL: 'https://api.twitter.com',
+    baseURL: 'https://api.x.com',
     withCredentials: true,
     headers: {
       Authorization: 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
@@ -392,7 +394,7 @@
 
   // fetch_likers and fetch_no_comment_reposters need to be merged into one function
   async function fetch_likers (tweetId) {
-    const response = await ajax.get(`https://twitter.com/i/api/graphql/-A3YSkEdbCV0rpHTkYZXCA/Favoriters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
+    const response = await ajax.get(`https://x.com/i/api/graphql/-A3YSkEdbCV0rpHTkYZXCA/Favoriters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
         const data = response.data;
 
         const users = data["data"]["favoriters_timeline"]["timeline"]["instructions"].reduce((acc, instruction) => {
@@ -414,7 +416,7 @@
   }
 
   async function fetch_no_comment_reposters (tweetId) {
-    const response = await ajax.get(`https://twitter.com/i/api/graphql/s6LwzbPawe8J04NldDYrQQ/Retweeters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
+    const response = await ajax.get(`https://x.com/i/api/graphql/s6LwzbPawe8J04NldDYrQQ/Retweeters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
         const data = response.data;
 
         const users = data["data"]["retweeters_timeline"]["timeline"]["instructions"].reduce((acc, instruction) => {
@@ -464,7 +466,7 @@
   }
 
   async function get_tweeter (tweetId) {
-    const screen_name = location.href.split('twitter.com/')[1].split('/')[0]
+    const screen_name = location.href.split('x.com/')[1].split('/')[0]
     const tweetData = (await ajax.get(`/2/timeline/conversation/${tweetId}.json`)).data
     // Find the tweeter by username
     const users = tweetData.globalObjects.users
