@@ -23,8 +23,6 @@
 // @require     https://cdn.jsdelivr.net/npm/axios@0.25.0/dist/axios.min.js
 // @require     https://cdn.jsdelivr.net/npm/qs@6.10.3/dist/qs.min.js
 // @require     https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js
-// @downloadURL https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.user.js
-// @updateURL https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.meta.js
 // ==/UserScript==
 
 /* global axios $ Qs */
