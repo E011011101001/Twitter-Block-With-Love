@@ -390,6 +390,35 @@
 
   const paramsREQ = `features=%7B%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D`
 
+  // fetch current followers
+  async function fetch_followers(userName, count) {
+    const paramsUserExtReq = `features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Afalse%2C%22longform_notetweets_rich_text_read_enabled%22%3Afalse%2C%22communities_web_enable_tweet_community_results_fetch%22%3Afalse%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Afalse%2C%22responsive_web_grok_analyze_button_fetch_trends_enabled%22%3Afalse%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22articles_preview_enabled%22%3Afalse%2C%22responsive_web_jetfuel_frame%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Afalse%2C%22creator_subscriptions_quote_tweet_preview_enabled%22%3Afalse%2C%22standardized_nudges_misinfo%22%3Afalse%2C%22view_counts_everywhere_api_enabled%22%3Afalse%2C%22rweb_video_timestamps_enabled%22%3Afalse%2C%22responsive_web_grok_analyze_post_followups_enabled%22%3Afalse%2C%22longform_notetweets_consumption_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Afalse%2C%22responsive_web_grok_share_attachment_enabled%22%3Afalse%2C%22responsive_web_grok_image_annotation_enabled%22%3Afalse%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Afalse%2C%22responsive_web_grok_analysis_button_from_backend%22%3Afalse%2C%22responsive_web_edit_tweet_api_enabled%22%3Afalse%2C%22premium_content_api_read_enabled%22%3Afalse%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Afalse%7D%26fieldToggles%3D%7B%22withAuxiliaryUserLabels%22%3Afalse%7D`
+    const userIdResponse = await ajax.get(`https://x.com/i/api/graphql/32pL5BWe9WKeSK1MoPvFQQ/UserByScreenName?variables=%7B%22screen_name%22%3A%22${userName}%22%7D&${paramsUserExtReq}`);
+    const userId = userIdResponse.data["data"]["user"]["result"]["rest_id"]
+    console.log('user rest id', userId);
+
+    const paramsExtREQ = `features=%7B%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22premium_content_api_read_enabled%22%3Afalse%2C%22communities_web_enable_tweet_community_results_fetch%22%3Atrue%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22responsive_web_grok_analyze_button_fetch_trends_enabled%22%3Afalse%2C%22responsive_web_grok_analyze_post_followups_enabled%22%3Atrue%2C%22responsive_web_jetfuel_frame%22%3Afalse%2C%22responsive_web_grok_share_attachment_enabled%22%3Atrue%2C%22articles_preview_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22responsive_web_grok_analysis_button_from_backend%22%3Atrue%2C%22creator_subscriptions_quote_tweet_preview_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_grok_image_annotation_enabled%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D%26fieldToggles%3D%7B%22withAuxiliaryUserLabels%22%3Afalse%7D`
+    const response = await ajax.get(`https://x.com/i/api/graphql/OGScL-RC4DFMsRGOCjPR6g/Followers?variables=%7B%22userId%22%3A%22${userId}%22%2C%22count%22%3A${count}%2C%22includePromotedContent%22%3Afalse%7D&${paramsExtREQ}`);
+    const data = response.data;
+
+    const users = data["data"]["user"]["result"]["timeline"]["timeline"]["instructions"].reduce((acc, instruction) => {
+        if (instruction.type === 'TimelineAddEntries') {
+            instruction.entries.forEach(entry => {
+                if (entry.content && entry.content.entryType === 'TimelineTimelineItem' && entry.content.itemContent && entry.content.itemContent.itemType === 'TimelineUser') {
+                    if (entry.content.itemContent.user_results && entry.content.itemContent.user_results.result && typeof entry.content.itemContent.user_results.result.rest_id !== "undefined") {
+                        const restId = entry.content.itemContent.user_results.result.rest_id;
+                        acc[restId] = true;
+                    }
+                }
+            });
+        }
+        return acc;
+    }, {});
+
+    const followers = Object.keys(users);
+    return followers;
+  }
+
   // fetch_likers and fetch_no_comment_reposters need to be merged into one function
   async function fetch_likers (tweetId) {
     const response = await ajax.get(`https://x.com/i/api/graphql/-A3YSkEdbCV0rpHTkYZXCA/Favoriters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
@@ -505,6 +534,13 @@
     likers.forEach(mute_user)
   }
 
+  async function block_followers () {
+    const userName = window.location.href.match(/http.*\/(\w+)\/followers/)[1]
+    const followers = await fetch_followers(userName, 10000)
+
+    followers.forEach(block_user)
+  }
+
   async function block_reposters () {
     const tweetId = get_tweet_id()
     const reposters = await fetch_no_comment_reposters(tweetId)
@@ -558,6 +594,8 @@
       block_all_likers()
     } else if (url.endsWith('/retweets')) {
       block_reposters()
+    } else if (url.endsWith('/followers')) {
+      block_followers()
     } else {
       console.error('Block is not implemented on this page.')
     }
@@ -821,7 +859,7 @@
         // Attention: /retweets may change to /reposts at any time.
         // Good job, Elon.
         // ♪ CEO, entrepreneur, born in 1971, Elon~~ Elon Reeve Musk~~ ♪♪
-        if (currentURL.endsWith('/likes') || currentURL.endsWith('/retweets')) {
+        if (currentURL.endsWith('/likes') || currentURL.endsWith('/retweets') || currentURL.endsWith('/followers')) {
           if ($('#tbwl-panel').length) {
             TBWLPanel.slideDown('fast')
           } else {
