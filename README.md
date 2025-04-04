@@ -22,8 +22,11 @@ If you are using Tampermonkey on Firefox and run into unexcepted problems, pleas
    - Check the "Include the original Tweeter" box if you want to. (By "Tweeter", I mean "poster".)
    - Click the "Block all" or "Mute all" button.
 
-3. Block/mute List members
+2. Block/mute List members
    - Go to the "List members" page, and click the "Block all" or "Mute all" button.
+
+3. Block/mute Followers
+   - Similarly as the above.
 
 After the above actions, a success notice like this will show up at the bottom.
 
