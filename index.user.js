@@ -3,7 +3,7 @@
 // @namespace   https://www.eolstudy.com
 // @homepage    https://github.com/E011011101001/Twitter-Block-With-Love
 // @icon        https://raw.githubusercontent.com/E011011101001/Twitter-Block-With-Love/master/imgs/icon.svg
-// @version     2025.04.04
+// @version     2025.10.25
 // @description Block or mute all the Twitter users who like or repost a specific post(Tweet), with love.
 // @description:fr Bloque ou mute tous les utilisateurs de Twitter qui aiment ou repostent un post spécifique (Tweet), avec amour.
 // @description:zh-CN 屏蔽或隐藏所有转发或点赞某条推文的推特用户
@@ -23,6 +23,8 @@
 // @require     https://cdn.jsdelivr.net/npm/axios@0.25.0/dist/axios.min.js
 // @require     https://cdn.jsdelivr.net/npm/qs@6.10.3/dist/qs.min.js
 // @require     https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js
+// @downloadURL https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.user.js
+// @updateURL   https://update.greasyfork.org/scripts/398540/Twitter%20Block%20With%20Love.meta.js
 // ==/UserScript==
 
 /* global axios $ Qs */
@@ -388,7 +390,7 @@
     return location.href.split('lists/')[1].split('/')[0]
   }
 
-  const paramsREQ = `features=%7B%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22c9s_tweet_anatomy_moderator_badge_enabled%22%3Atrue%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22responsive_web_twitter_article_tweet_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Atrue%2C%22rweb_video_timestamps_enabled%22%3Atrue%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Atrue%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D`
+  const paramsREQ = `features=${encodeURIComponent('{"rweb_video_screen_enabled":false,"payments_enabled":false,"profile_label_improvements_pcf_label_in_post_enabled":true,"responsive_web_profile_redirect_enabled":false,"rweb_tipjar_consumption_enabled":true,"verified_phone_label_enabled":false,"creator_subscriptions_tweet_preview_api_enabled":true,"responsive_web_graphql_timeline_navigation_enabled":true,"responsive_web_graphql_skip_user_profile_image_extensions_enabled":false,"premium_content_api_read_enabled":false,"communities_web_enable_tweet_community_results_fetch":true,"c9s_tweet_anatomy_moderator_badge_enabled":true,"responsive_web_grok_analyze_button_fetch_trends_enabled":false,"responsive_web_grok_analyze_post_followups_enabled":true,"responsive_web_jetfuel_frame":true,"responsive_web_grok_share_attachment_enabled":true,"articles_preview_enabled":true,"responsive_web_edit_tweet_api_enabled":true,"graphql_is_translatable_rweb_tweet_is_translatable_enabled":true,"view_counts_everywhere_api_enabled":true,"longform_notetweets_consumption_enabled":true,"responsive_web_twitter_article_tweet_consumption_enabled":true,"tweet_awards_web_tipping_enabled":false,"responsive_web_grok_show_grok_translated_post":false,"responsive_web_grok_analysis_button_from_backend":true,"creator_subscriptions_quote_tweet_preview_enabled":false,"freedom_of_speech_not_reach_fetch_enabled":true,"standardized_nudges_misinfo":true,"tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled":true,"longform_notetweets_rich_text_read_enabled":true,"longform_notetweets_inline_media_enabled":true,"responsive_web_grok_image_annotation_enabled":true,"responsive_web_grok_imagine_annotation_enabled":true,"responsive_web_grok_community_note_auto_translation_is_enabled":false,"responsive_web_enhance_cards_enabled":false}')}`
 
   // fetch current followers
   async function fetch_followers(userName, count) {
@@ -442,27 +444,35 @@
         return likers;
   }
 
-  async function fetch_no_comment_reposters (tweetId) {
-    const response = await ajax.get(`https://x.com/i/api/graphql/s6LwzbPawe8J04NldDYrQQ/Retweeters?variables=%7B%22tweetId%22%3A%22${tweetId}%22%2C%22includePromotedContent%22%3Atrue%7D&${paramsREQ}`);
-        const data = response.data;
+  async function fetch_no_comment_reposters(tweetId) {
+      const baseURL = "https://x.com/i/api/graphql/lCe6teWhgwxNsm2den4S8g/Retweeters";
+      const options = [true, false];
+      const users = {};
 
-        const users = data["data"]["retweeters_timeline"]["timeline"]["instructions"].reduce((acc, instruction) => {
-        if (instruction.type === 'TimelineAddEntries') {
-            instruction.entries.forEach(entry => {
-                if (entry.content && entry.content.entryType === 'TimelineTimelineItem' && entry.content.itemContent && entry.content.itemContent.itemType === 'TimelineUser') {
-                    if (entry.content.itemContent.user_results && entry.content.itemContent.user_results.result && typeof entry.content.itemContent.user_results.result.rest_id !== "undefined") {
-                        const restId = entry.content.itemContent.user_results.result.rest_id;
-                        acc[restId] = true;
-                    }
-                }
-            });
-        }
-            return acc;
-        }, {});
+      const responses = await Promise.all(options.map(enableRanking =>
+          ajax.get(`${baseURL}?variables=${encodeURIComponent(JSON.stringify({
+          tweetId,
+          enableRanking,
+          includePromotedContent: true
+        }))}&${paramsREQ}`)
+      ));
+
+      for (const { data } of responses) {
+          for (const instruction of data?.data?.retweeters_timeline?.timeline?.instructions ?? []) {
+              if (instruction.type === "TimelineAddEntries") {
+                  for (const entry of instruction.entries ?? []) {
+                      const user = entry?.content?.itemContent?.user_results?.result;
+                      if (user?.rest_id && user?.relationship_perspectives?.blocking !== true)
+                          users[user.rest_id] = true;
+                  }
+              }
+          }
+      }
 
       const reposters = Object.keys(users);
       return reposters;
   }
+
 
 
 
@@ -551,6 +561,7 @@
       }
     }
     reposters.forEach(block_user)
+    //alert(`${reposters.length} blocked account(s)`)
   }
 
   async function mute_reposters () {
