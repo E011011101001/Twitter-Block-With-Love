@@ -11,7 +11,7 @@ It also supports blocking or muting reposters or list members.
 ## Install
 Visit https://greasyfork.org/en/scripts/398540-twitter-block-with-love and install.
 
-You may also need to install a script manager like [**Tampermonkey**](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=zh-CN) for Chrome or [**Greasemonkey**](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) for Firefox, or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) for Firefox Android.
+You may also need to install a script manager like [**Tampermonkey**](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) for Chrome or [**Greasemonkey**](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) for Firefox, or [Violentmonkey](https://addons.mozilla.org/en-US/firefox/addon/violentmonkey/) for Firefox Android.
 
 If you are using Tampermonkey on Firefox and run into unexcepted problems, please refer to [this issue](https://github.com/E011011101001/Twitter-Block-With-Love/issues/1#issuecomment-606785462). Turning off `security.csp.enable` on [about:config](about:config) may help.
 
@@ -36,7 +36,7 @@ You may need to refresh the page if you want to check the effects immediately.
 
 ## Notice
 
-- Blocking too many users in a 15-minute interval may cause you automatically logged out. For More details you may [click here](https://developer.twitter.com/en/docs/basics/rate-limiting).
+- Blocking too many users in a 15-minute interval may cause you automatically logged out. For More details you may [click here](https://docs.x.com/fundamentals/rate-limits).
 - This userscript cannot block users who have blocked you or whose accounts are set private.
 - This userscript does not support leaving out your followings or followers when blocking.
 - The blocking operation ***CANNOT BE UNDONE***. **Think twice** before blocking and consider whether you really need to block that group of users.
