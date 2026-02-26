@@ -367,6 +367,9 @@
     return dom
   }
 
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+  const DELAY_BETWEEN_REQUESTS = 100
+
   const ajax = axios.create({
     baseURL: 'https://api.x.com',
     withCredentials: true,
@@ -377,6 +380,19 @@
       'X-Csrf-Token': get_cookie('ct0')
     }
   })
+
+  ajax.interceptors.response.use(
+    response => response,
+    async error => {
+      const { config, response } = error
+      if (response && response.status === 429) {
+        console.log('[TBWL] Rate limit exceeded. Waiting 10s...')
+        await wait(10000)
+        return ajax(config)
+      }
+      return Promise.reject(error)
+    }
+  )
 
   function get_tweet_id () {
     // https://twitter.com/any/thing/status/1234567/anything => 1234567/anything => 1234567
@@ -473,7 +489,7 @@
   }
 
   function block_user (id) {
-    ajax.post('/1.1/blocks/create.json', Qs.stringify({
+    return ajax.post('/1.1/blocks/create.json', Qs.stringify({
       user_id: id
     }), {
       headers: {
@@ -483,7 +499,7 @@
   }
 
   function mute_user (id) {
-    ajax.post('/1.1/mutes/users/create.json', Qs.stringify({
+    return ajax.post('/1.1/mutes/users/create.json', Qs.stringify({
       user_id: id
     }), {
       headers: {
@@ -519,7 +535,10 @@
         likers.push(tweeter)
       }
     }
-    likers.forEach(block_user)
+    for (const id of likers) {
+      await block_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function mute_all_likers () {
@@ -531,14 +550,20 @@
         likers.push(tweeter)
       }
     }
-    likers.forEach(mute_user)
+    for (const id of likers) {
+      await mute_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function block_followers () {
     const userName = window.location.href.match(/http.*\/(\w+)\/followers/)[1]
     const followers = await fetch_followers(userName, 10000)
 
-    followers.forEach(block_user)
+    for (const id of followers) {
+      await block_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function block_reposters () {
@@ -550,7 +575,10 @@
         reposters.push(tweeter)
       }
     }
-    reposters.forEach(block_user)
+    for (const id of reposters) {
+      await block_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function mute_reposters () {
@@ -562,27 +590,36 @@
         reposters.push(tweeter)
       }
     }
-    reposters.forEach(mute_user)
+    for (const id of reposters) {
+      await mute_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function block_list_members () {
     const listId = get_list_id()
     const members = await fetch_list_members(listId)
-    members.forEach(block_user)
+    for (const id of members) {
+      await block_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function mute_list_members () {
     const listId = get_list_id()
     const members = await fetch_list_members(listId)
-    members.forEach(mute_user)
+    for (const id of members) {
+      await mute_user(id)
+      await wait(DELAY_BETWEEN_REQUESTS)
+    }
   }
 
   async function mute () {
     const url = window.location.href
     if (url.endsWith('/likes')) {
-      mute_all_likers()
+      await mute_all_likers()
     } else if (url.endsWith('/retweets')) {
-      mute_reposters()
+      await mute_reposters()
     } else {
       console.error('Mute is not implemented on this page.')
     }
@@ -591,11 +628,11 @@
   async function block () {
     const url = window.location.href
     if (url.endsWith('/likes')) {
-      block_all_likers()
+      await block_all_likers()
     } else if (url.endsWith('/retweets')) {
-      block_reposters()
+      await block_reposters()
     } else if (url.endsWith('/followers')) {
-      block_followers()
+      await block_followers()
     } else {
       console.error('Block is not implemented on this page.')
     }
@@ -677,8 +714,10 @@
           $(this).addClass(btn_hover)
         }
       })
-      .click(executer)
-      .click(success_notifier)
+      .click(async () => {
+        await executer()
+        success_notifier()
+      })
 
     parentDom.append(button)
   }
